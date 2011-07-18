@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+
+# Program to draw separators between commands
+# I made this because I often type commands which have many pages of output
+# (e.g. 'cvs diff -u' and 'darcs whatsnew').  If these commands use colors,
+# they can't be shown easily in less(1).  The separators make it easy to
+# see where the command started.
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+
+import ansi, sys, os
+
+# lifted from http://pdos.csail.mit.edu/~cblake/cls/cls.py
+# --------------------------------------------------------
+env = os.environ
+
+def ioctl_GWINSZ(fd):                  #### TABULATION FUNCTIONS
+    try:                                ### Discover terminal width
+        import fcntl, termios, struct, os
+        cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
+    except:
+        return None
+    return cr
+
+def terminal_size():                    ### decide on *some* terminal size
+    cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)  # try open fds
+    if not cr:                                                  # ...then ctty
+        try:
+            fd = os.open(os.ctermid(), os.O_RDONLY)
+            cr = ioctl_GWINSZ(fd)
+            os.close(fd)
+        except:
+            pass
+    if not cr:                            # env vars or finally defaults
+        try:
+            cr = (env['LINES'], env['COLUMNS'])
+        except:
+            cr = (25, 80)
+    return int(cr[1]), int(cr[0])         # reverse rows, cols
+# --------------------------------------------------------
+
+termwidth, termheight = terminal_size()
+symbol = '#'
+pound_colors = ansi.RED
+command_colors = ansi.BOLD
+
+command = ' ' + ' '.join(sys.argv[1:]) + ' '
+if not command.strip():
+    command = ''
+command_len = len(command)
+remaining = termwidth - command_len
+
+left = symbol * (remaining / 2)
+right = left
+# if odd number of characters, put the extra # on the right
+if remaining % 2 == 1:
+    right += symbol
+
+print pound_colors + symbol * termwidth
+print ''.join((left, ansi.RESET, 
+               command_colors, command, ansi.RESET, 
+               pound_colors, right))
+print symbol * termwidth + ansi.RESET
+if command:
+    os.system(command)

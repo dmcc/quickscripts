@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+
+# put "thrash" before your command and the command will be monitored for thrashing
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+
+import os, sys, time, ansi
+
+command = sys.argv[1:]
+print "Command:", ' '.join(command)
+
+pid = os.fork()
+if pid == 0: # child
+    os.execvp(command[0], command)
+else: # parent
+    maxes = {}
+    while 1:
+        print
+        print ansi.RED + "[Time:", time.asctime(),
+        stats = []
+        for line in file('/proc/%s/status' % pid, 'r'):
+            if line.startswith('Vm'):
+                # example line: "VmRSS:      1036 kB"
+                attr, val, unit = line.split()
+                attr = attr[:-1]
+                val = int(val)
+                stats.append("%s: %s" % (attr, val))
+                maxes.setdefault(attr, 0)
+                maxes[attr] = max(maxes[attr], val)
+        if stats:
+            print "Cur", ", ".join(stats)
+        else:
+            raise SystemExit # XXX bad hack
+        print "Max", ', '.join(["%s: %s" % pair 
+            for pair in maxes.items()]) + "]"
+        print ansi.RESET
+        time.sleep(2)

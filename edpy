@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+
+# Edit a Python module using its module name rather than filesystem path
+# e.g. 'edpy tempfile'
+#      'edpy calendar.Calendar' -- takes you directly to the class
+#      'edpy calendar.Calendar.monthdayscalendar' -- takes you directly to the method
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+
+# vi: syntax=python
+
+import sys, inspect, os
+
+args = sys.argv[1:]
+editor_args = []
+pieces = []
+for piece in args:
+    if piece[0] == '-':
+        editor_args.append(piece)
+    else:
+        pieces.extend(piece.split('.'))
+pieces = [p for p in pieces if p not in ('from', 'import', 'as')]
+
+obj_pieces = []
+while 1:
+    try:
+        modulename = '.'.join(pieces)
+        module = __import__(modulename, globals(), locals(), modulename)
+        break
+    except ImportError:
+        obj_pieces.insert(0, pieces.pop(-1))
+
+obj = module
+while obj_pieces:
+    obj = getattr(obj, obj_pieces.pop(0))
+
+filename = inspect.getsourcefile(obj).replace('.pyc', '.py')
+lines, lineno = inspect.findsource(obj)
+
+editor = os.getenv('EDITOR', 'vi')
+# seems vi and emacs support this
+if ('vi' in editor or 'emacs' in editor) and lineno is not None:
+    editor_args.append(' +%d' % (lineno + 1))
+
+command = "%s %s %s" % (editor, ' '.join(editor_args), filename)
+print "Running", repr(command)
+os.system(command)

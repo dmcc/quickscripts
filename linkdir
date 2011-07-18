@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+# vi: syntax=python
+# make softlinks to all files in a directory to the current directory
+
+# TODO: document suffix syntax and usage
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+
+import sys, os
+curdir = os.getcwd()
+for dirname in sys.argv[1:]:
+    if '=' in dirname:
+        suffix, dirname = dirname.split('=')
+    else:
+        suffix = None
+
+    dirname = os.path.expanduser(dirname)
+
+    for filename in os.listdir(dirname):
+        oldname = os.path.join(dirname, filename)
+
+        if suffix:
+            root, ext = os.path.splitext(filename)
+            newname = os.path.join(curdir, "%s-%s%s" % (root, suffix, ext))
+        else:
+            newname = os.path.join(curdir, filename)
+
+        os.symlink(oldname, newname)
