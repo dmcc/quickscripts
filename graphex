@@ -5,6 +5,9 @@
 #                                                X        Y1       Y2       Y3
 # will make a scatter plot of X vs Y1, X vs Y2, and X vs Y3
 
+# Dependencies: 
+#   matplotlib: http://matplotlib.sourceforge.net/
+
 # Author: David McClosky
 # Homepage: http://zorglish.org
 # Code: http://code.zorglish.org

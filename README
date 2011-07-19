@@ -8,9 +8,11 @@ Dependencies
 
 - Some need mx.DateTime: http://pypi.python.org/pypi/egenix-mx-base/
 
+- Some need matplotlib: http://matplotlib.sourceforge.net/
+
 License
 -------
-GPLv2
+GPLv2 (at least for the ones authored by me)
 
 -- David McClosky
    http://zorglish.org

@@ -2,6 +2,9 @@
 
 # essentially my alarm clock logic -- handles any date/time format that mx.DateTime can handle
 
+# Dependencies:
+#   mx.DateTime: http://pypi.python.org/pypi/egenix-mx-base/
+
 # Author: David McClosky
 # Homepage: http://zorglish.org
 # Code: http://code.zorglish.org
