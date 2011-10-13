@@ -68,12 +68,12 @@ def main():
     root = Tk()
     root.title("Stopwatch")
     sw = StopWatch(root)
-    sw.pack(side=TOP)
+    sw.pack(side=TOP, expand=True)
     
-    Button(root, text='Start', command=sw.Start).pack(side=LEFT)
-    Button(root, text='Stop', command=sw.Stop).pack(side=LEFT)
-    Button(root, text='Reset', command=sw.Reset).pack(side=LEFT)
-    Button(root, text='Quit', command=root.quit).pack(side=LEFT)
+    Button(root, text='Start', command=sw.Start).pack(side=LEFT, expand=True, fill=BOTH)
+    Button(root, text='Stop', command=sw.Stop).pack(side=LEFT, expand=True, fill=BOTH)
+    Button(root, text='Reset', command=sw.Reset).pack(side=LEFT, expand=True, fill=BOTH)
+    Button(root, text='Quit', command=root.quit).pack(side=LEFT, expand=True, fill=BOTH)
     
     root.mainloop()
 
