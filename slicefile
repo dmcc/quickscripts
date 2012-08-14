@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+
+# Extract a slice from a file or stdin.  Assumes zero indexing.
+# Usage: slicefile start end [filenames]
+#   e.g. slicefile 3 10 testfile
+#   ---> output lines 4-11 from testfile to stdout
+#   e.g. slicefile 3 10 testfile
+#   ---> output lines 4-11 from stdin to stdout
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+
+import sys
+import fileinput
+
+start = int(sys.argv[1])
+end = int(sys.argv[2])
+files = sys.argv[3:]
+
+for i, line in enumerate(fileinput.input(files)):
+    if i < start:
+        continue
+    elif i > end:
+        break
+    else:
+        sys.stdout.write(line)
