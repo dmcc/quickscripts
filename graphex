@@ -1,11 +1,20 @@
 #!/usr/bin/env python
 
-# simple way to graph numbers in a text file
+# Simple way to make a scatter plot of numbers in a text file
+
 # example usage: graphex "F1 score for threshold (\S+) is (\S+)\(P (\S+), R (\S+)\)"
 #                                                X        Y1       Y2       Y3
 # will make a scatter plot of X vs Y1, X vs Y2, and X vs Y3
+# If only one field is given, it will automatically number starting from 0.
 
-# Dependencies: 
+# You can name fields now too:
+# graphex "Z: (?P<Z>\d+) X: (?P<X>\d+) Y: (?P<Y>\d+)"
+# will graph X vs Z and X vs Y.
+
+# graphex "(?P<cats>\S+) (?P<dogs>\S+) (?P<rats>\S+)"
+# Since there's no field named 'x' or 'X', it will use automatic numbering.
+
+# Dependencies:
 #   matplotlib: http://matplotlib.sourceforge.net/
 
 # Author: David McClosky
@@ -15,15 +24,38 @@
 import sys, re, pylab
 regex = re.compile(sys.argv[1])
 points = []
+match_index = 0
+names = None
 for line in sys.stdin:
     match = regex.search(line)
     if match:
-        points.append(map(float, match.groups()))
+        groupdict = match.groupdict()
+        if groupdict:
+            names = sorted(groupdict.keys())
+            items = sorted(groupdict.items())
+            if not ('x' in groupdict or 'X' in groupdict):
+                items.insert(0, ('X', match_index))
+            all_values = [float(value) for key, value in items]
+        else:
+            all_values = map(float, match.groups())
+            if len(all_values) == 1:
+                all_values = [match_index] + all_values
 
-colors = iter('brg')
+        points.append(all_values)
+        match_index += 1
+
+colors = iter('rgb')
+
+if not points:
+    print "Error: didn't match any lines"
+    raise SystemExit
 
 transformed = zip(*points)
 x = transformed[0]
 for y in transformed[1:]:
     pylab.scatter(x, y, c=colors.next())
+
+if names:
+    pylab.legend(tuple(names))
+
 pylab.show()
