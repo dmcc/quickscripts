@@ -1,0 +1,132 @@
+#!/usr/bin/env python
+
+# "editron move" -- rename or move files by editing filenames in your
+# favorite text editron
+
+# ------------------------------------------------------
+# use with caution! this code is not sufficiently tested
+# ------------------------------------------------------
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+
+# vi: syntax=python
+
+# TODO: better assertions, assertion handling
+#       spit it out if there are errors and describe what we already did
+#       read options from .edmvrc?
+#       make sure we never overwrite files
+#       try to put temp dirs in the dir of the original files
+
+import sys, os, os.path, shutil, tempfile
+
+DEFAULT_EDITOR = "vim -gf '%s'"  # I'm a vim-guy, myself
+
+def saferename(source, target):
+    """Do a "mv -i" and make sure that we don't overwrite any files."""
+    if os.path.exists(target):
+        raise OSError("Target %r already exists." % target)
+    else:
+        shutil.move(source, target)
+
+file_mapping = []  # we save this so we can gracefully handle errors
+
+def unique(seq):
+    """Removes duplicate elements from a sequence.  This function is
+    not stable at all."""
+    u = {}
+    for x in seq:
+        u[x] = 1
+    return u.keys()
+
+def has_no_duplicates(seq):
+    """Returns whether a sequence has no duplicates."""
+    uniq_version = unique(seq)
+    # if there were duplicates, len(uniq_version) should be less than the
+    # original
+    return len(seq) == len(uniq_version)
+
+def error(message):
+    """Print a message and exit, printing a log of what we did and how to
+    undo it."""
+    # TODO: actually do the graceful exit and such
+    print "Error:", message
+    if file_mapping:
+        print "Mapping table:"
+        for old, inter, new in file_mapping:
+            print repr(old), repr(inter), repr(new)
+    else:
+        print "No mapping table yet -- no changes were made."
+    sys.exit(1)
+
+def editron_move(editron=DEFAULT_EDITOR, files_to_rename=None):
+    old_list = files_to_rename or []  # TODO: warn when old_list is empty
+
+    filename_list = tempfile.NamedTemporaryFile('r+w', dir="/tmp",
+                                                prefix="edmv")
+    filename_list.write('\n'.join(old_list) + '\n')
+    filename_list.flush()
+    filename_list_file = filename_list.name
+
+    # editron must have exactly one %s
+    assert(editron.count('%s') == 1)
+    try:
+        command = editron % filename_list_file
+    except TypeError:
+        # we will get this if there are too many things to interpolate
+        error("editor ('%s') should have exactly one thing to interpolate." %
+              command)
+
+    print 'run', command
+    os.system(command)
+
+    filename_list.seek(0)
+    new_list = filename_list.read().splitlines()
+
+    for old, new in zip(old_list, new_list):
+        print "%s -> %s" % (old, new)
+
+    try:
+        perform_rename(old_list, new_list)
+    except AssertionError:
+        error("Assertion error -- descriptions coming soon")
+
+def perform_rename(old_list, new_list):
+    global file_mapping
+
+    assert has_no_duplicates(old_list)
+    assert has_no_duplicates(new_list)
+
+    # first, create a secure temporary directory
+    temp_directory = tempfile.mkdtemp(prefix='edmv')
+
+    def intermediate_name(old_name):
+        return "%s/%d-%s" % (temp_directory, old_list.index(old), old)
+
+    file_mapping = [(old, intermediate_name(old), new)
+                    for old, new in zip(old_list, new_list)]
+
+    # next, move every file to the temporary directory, giving it a unique
+    # name -- list index is sufficient in this case
+    for old, inter, new in file_mapping:
+        print "rename %r -> %r" % (old, inter)
+        shutil.move(old, inter)
+    for old, inter, new in file_mapping:
+        print "rename %r -> %r" % (inter, new)
+        shutil.move(inter, new)
+
+    # erase temporary directory -- everything should have been moved out of it
+    # TODO: make sure it is empty
+    os.removedirs(temp_directory)
+
+if __name__ == "__main__":
+    from optparse import OptionParser
+
+    parser = OptionParser()
+    parser.add_option("-e", "--editor",
+                      dest="editor", default=DEFAULT_EDITOR,
+                      help="Editron to use")
+
+    (options, files) = parser.parse_args()
+    editron_move(options.editor, files)
