@@ -11,13 +11,9 @@ See also quickcolorize which is similar but doesn't do filtering."""
 # Homepage: http://zorglish.org
 # Code: http://code.zorglish.org
 
-import sys, itertools
+import sys
 import ansi
 from QuickColorize import colorize
-
-ansi_colors = [getattr(ansi, attr) for attr in dir(ansi) 
-    if attr == attr.upper() and attr not in ('BOLD', 'REVERSE', 'RESET')]
-ansi_colors = itertools.cycle(ansi_colors)
 
 words = sys.argv[1:]
 for line in sys.stdin:
@@ -29,5 +25,6 @@ for line in sys.stdin:
     if not skip:
         for word in words:
             color_word = colorize(word)
-            line = line.replace(word, ansi.BOLD + color_word) # no ansi.RESET needed since colorize() does that for us
+            # no ansi.RESET needed since colorize() does that for us
+            line = line.replace(word, ansi.BOLD + color_word)
         sys.stdout.write(line)
