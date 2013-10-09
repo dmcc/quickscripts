@@ -8,6 +8,8 @@
 
 import os, sys, time, ansi
 
+period = int(os.getenv('THRASH_PERIOD', '15'))
+
 command = sys.argv[1:]
 print "Command:", ' '.join(command)
 
@@ -36,4 +38,4 @@ else: # parent
         print "Max", ', '.join(["%s: %s" % pair 
             for pair in maxes.items()]) + "]"
         print ansi.RESET
-        time.sleep(2)
+        time.sleep(period)
