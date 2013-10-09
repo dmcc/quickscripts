@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+
+# a quick command-line program for adding up numbers across columns
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+
+import sys, re
+from waterworks.Strings import try_parse_float
+from AIMA import vector_add
+
+not_numbers_re = re.compile('[^0-9\.]')
+def cleanup(cell):
+    numbers_only = not_numbers_re.sub('', cell)
+    return try_parse_float(cell, 0)
+
+lines = sys.stdin.readlines()
+totals = None
+for line in lines:
+    # print 'totals', totals
+    row = [cleanup(cell) for cell in line.split()]
+    # print 'row', row
+    if totals is None:
+        totals = row
+    else:
+        assert len(row) == len(totals)
+        totals = vector_add(totals, row)
+
+print totals

@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+
+# Run a program while dumping its output to a file and displaying it on screen.
+# Detailed information about the command run (arguments, duration, working
+# directory, return code, etc.) is also recorded.
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+
+import os, sys, time
+from waterworks.Strings import pretty_time_range
+from waterworks.Processes import bettersystem
+from path import path
+
+# TODO make sure output file doesn't exist yet
+
+def format_time(seconds):
+    return time.strftime('%Y.%m.%d-%H.%M.%S', time.localtime(seconds))
+
+class Tee:
+    def __init__(self, stream):
+        self.stream = stream
+    def write(self, s):
+        self.stream.write(s)
+        sys.__stdout__.write(s)
+        sys.__stdout__.flush()
+    def __getattr__(self, attr):
+        return getattr(self.stream, attr)
+
+start = time.time()
+
+args = sys.argv[1:]
+if not args:
+    print "Usage: tea command [args]"
+    sys.exit(1)
+
+command = args[0]
+if '|' in command or '>' in command or '<' in command: # shell commands are handled differently
+    normalized_command = path(command.split()[0]).basename()
+else:
+    normalized_command = path(command).basename()
+start_time_desc = format_time(start)
+output_filename = 'tea-%s-%s.log' % (normalized_command, start_time_desc)
+print "(redirecting to %s)" % output_filename
+print
+
+# redirect stdout/stderr
+output_file = file(output_filename, 'w')
+tee = Tee(output_file)
+sys.stdout = tee
+sys.stderr = tee
+
+output_file.write(' '.join(args) + '\n\n')
+print 'Command:          ', command
+if not args:
+    print 'Args:              (none)'
+else:
+    for i, arg in enumerate(args):
+        print 'Argument %d:\t       %s' % (i, arg)
+print 'Working directory:', os.getcwd()
+print 'Start time:       ', start_time_desc
+print '-' * 18
+
+return_code = bettersystem(' '.join(args))
+end = time.time()
+
+print '-' * 18
+if return_code != 0:
+    print 'Return code:      ', return_code
+print 'End time:         ', format_time(end)
+diff = end - start
+if diff > 0.1:
+    print 'Duration:         ', pretty_time_range(diff)
