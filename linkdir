@@ -3,6 +3,7 @@
 # make softlinks to all files in a directory to the current directory
 
 # TODO: document suffix syntax and usage
+# TODO: option for crash on errors?
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
@@ -27,4 +28,8 @@ for dirname in sys.argv[1:]:
         else:
             newname = os.path.join(curdir, filename)
 
-        os.symlink(oldname, newname)
+        try:
+            os.symlink(oldname, newname)
+            print "Linked", oldname, "to", newname
+        except OSError:
+            print "Couldn't make link from", oldname, "to", newname
