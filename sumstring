@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+from waterworks.Strings import sumstring
+
+# a quick command-line program for adding up a list of numbers
+# white space is ignored
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+
+import sys
+text = sys.stdin.read()
+print 'Sum:', sumstring(text)
