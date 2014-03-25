@@ -16,12 +16,31 @@
 
 import sys
 from vimdiff import vimdiff
+import optparse
+
+parser = optparse.OptionParser()
+parser.add_option('-w', '--split-by-whitespace', action='store_true',
+    help='Convert all whitespace to newlines')
+parser.add_option('-s', '--split-by-sentences', action='store_true',
+    help='Convert sentence breaks (not very general: ". ") to newlines')
+parser.add_option('-d', '--split-by-delimiter',
+    help='Split into lines by a delimter.', metavar='DELIMITER')
+opts, args = parser.parse_args()
 
 # TODO could be generalized to K bits of text
 
-text1 = sys.stdin.read().strip()
+def split(text):
+    if opts.split_by_whitespace:
+        text = '\n'.join(text.split())
+    elif opts.split_by_sentences:
+        text = '\n'.join(text.split('. '))
+    elif opts.split_by_delimiter:
+        text = '\n'.join(text.split(opts.split_by_delimiter))
+    return text
+
+text1 = split(sys.stdin.read().strip())
 print "Read text 1 (%s chars)" % len(text1)
-text2 = sys.stdin.read().strip()
+text2 = split(sys.stdin.read().strip())
 print "Read text 2 (%s chars)" % len(text2)
 
 vimdiff(text1, text2)
