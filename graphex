@@ -14,6 +14,9 @@
 # graphex "(?P<cats>\S+) (?P<dogs>\S+) (?P<rats>\S+)"
 # Since there's no field named 'x' or 'X', it will use automatic numbering.
 
+# graphex "\s+[0-9.]+\s+[0-9.]+\s+[0-9.]+\s+[0-9.]+\s+[0-9.]+\s+(?P<Y>0.\d+)\s+[0-9.]+\s+(?P<Z>0.\d+)\s+\((?P<X>[0-9.]+)\)"
+# Extracts f-scores and regularization from cvlm
+
 # Dependencies:
 #   matplotlib: http://matplotlib.sourceforge.net/
 
@@ -54,8 +57,10 @@ transformed = zip(*points)
 x = transformed[0]
 for y in transformed[1:]:
     pylab.scatter(x, y, c=colors.next())
+    for item in sorted(zip(x, y)):
+        print item
 
 if names:
-    pylab.legend(tuple(names))
+    pylab.legend(tuple(names[1:]))
 
 pylab.show()
