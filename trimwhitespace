@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+
+# Removes preceding and trailing whitespace from each line
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+import fileinput
+
+for line in fileinput.input():
+    print line.strip()
