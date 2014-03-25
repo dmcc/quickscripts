@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+
+# Given a list of numbers, provides some summary statistics and prints
+# a histogram.
+
+# Dependencies:
+# needs my waterworks library:
+#   https://bitbucket.org/dmcc/waterworks
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+
+from __future__ import division
+import fileinput
+import AIMA
+from waterworks.Strings import try_parse_float
+import Histogram
+nums = []
+for line in fileinput.input():
+    nums.extend(try_parse_float(piece, None) for piece in line.split())
+nums = [num for num in nums if num is not None]
+
+def pretty_percent(count):
+    percent = 100 * count / len(nums)
+    return '%.1f%%' % percent
+
+def summary_func_describer(func):
+    def new_func(nums):
+        val = func(nums)
+        count = nums.count(val)
+        return '%s [%d, %s]' % (val, count, pretty_percent(count))
+    return new_func
+
+def uniq(nums):
+    num_uniq = len(set(nums))
+    return '%s [%s]' % (num_uniq, pretty_percent(num_uniq))
+
+def count_zeros(nums):
+    num_zeros = nums.count(0)
+    return '%s [%s]' % (num_zeros, pretty_percent(num_zeros))
+
+funcs = (
+    ('min', summary_func_describer(min)),
+    ('max', summary_func_describer(max)),
+    ('mean', summary_func_describer(AIMA.mean)),
+    ('mode', summary_func_describer(AIMA.mode)),
+    ('median', summary_func_describer(AIMA.median)),
+    ('stddev', AIMA.stddev),
+    ('sum', sum),
+    ('num uniq', uniq),
+    ('num 0s', count_zeros),
+    ('len', len),
+)
+
+for name, func in funcs:
+    try:
+        result = func(nums)
+    except Exception, e:
+        result = e
+    print "%10s: %s" % (name, result)
+
+print ' histogram:'
+try:
+    print Histogram.histogramify(nums)
+except Exception, e:
+    print e
