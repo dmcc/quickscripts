@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+
+# Print out the full path to a filename and copy it to the X clipboard.
+# If multiple filenames are given, only the last one will be copied to
+# the clipboard. Requires 'xclip'.
+# Usage: fullpathto [filenames]
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://code.zorglish.org
+
+import sys, os
+from path import path
+
+args = sys.argv[1:] or ['.']
+for filename in args:
+    fullpath = path(filename).abspath()
+    print fullpath
+    command = "echo '%s' | xclip -in" % fullpath
+    os.system(command)
