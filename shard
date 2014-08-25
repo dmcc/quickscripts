@@ -37,6 +37,7 @@ shard_files = [file(template % (filename, shard), 'w')
     for shard in range(num_shards)]
 shard_file_cycler = itertools.cycle(shard_files)
 
-for line in file(filename):
-    shard_file = shard_file_cycler.next()
-    shard_file.write(line)
+for filename in filenames:
+    for line in file(filename):
+        shard_file = shard_file_cycler.next()
+        shard_file.write(line)
