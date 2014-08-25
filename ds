@@ -64,4 +64,4 @@ print ''.join((left, ansi.RESET,
                pound_colors, right))
 print symbol * termwidth + ansi.RESET
 if command:
-    os.system(command)
+    sys.exit(os.system(command))
