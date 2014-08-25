@@ -53,6 +53,7 @@ sys.stderr = tee
 
 output_file.write(' '.join(args) + '\n\n')
 print 'Command:          ', command
+args.pop(0)
 if not args:
     print 'Args:              (none)'
 else:
@@ -62,7 +63,7 @@ print 'Working directory:', os.getcwd()
 print 'Start time:       ', start_time_desc
 print '-' * 18
 
-return_code = bettersystem(' '.join(args))
+return_code = bettersystem(' '.join([command] + args))
 end = time.time()
 
 print '-' * 18
