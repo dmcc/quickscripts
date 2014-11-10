@@ -16,5 +16,7 @@ args = sys.argv[1:] or ['.']
 for filename in args:
     fullpath = path(filename).abspath()
     print fullpath
+    if not fullpath.exists():
+        print '\twarning: above path does not exist'
     command = "echo '%s' | xclip -in" % fullpath
     os.system(command)
