@@ -42,7 +42,7 @@ else:
     normalized_command = path(command).basename()
 start_time_desc = format_time(start)
 output_filename = path('tea-%s-%s.log' % (normalized_command, start_time_desc))
-if not output_filename.access(os.W_OK):
+if not path('.').access(os.W_OK):
     output_filename = path('/tmp')/output_filename
 print "(redirecting to %s)" % output_filename
 print
