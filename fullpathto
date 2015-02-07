@@ -2,19 +2,37 @@
 
 # Print out the full path to a filename and copy it to the X clipboard.
 # If multiple filenames are given, only the last one will be copied to
-# the clipboard. Requires 'xclip'.
+# the clipboard. Requires 'xclip' for clipboard copying.
+
+# If your filesystem is filled with ugly symlinks, you can set
+# $FULLPATHTO_PREFIXES to a colon (:) separated list of path prefixes
+# which will be stripped from paths before they're printed.
+
 # Usage: fullpathto [filenames]
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
 # Code: http://code.zorglish.org
 
-import sys, os
+import sys
+import os
 from path import path
+
+prefixes_to_drop = os.getenv('FULLPATHTO_PREFIXES', '').split(':')
+
+def drop_prefixes(filename):
+    for prefix in prefixes_to_drop:
+        # strip extra slashes which will screw up our replacements
+        while prefix.endswith('/'):
+            prefix = prefix[:-1]
+
+        if filename.startswith(prefix):
+            filename = filename[len(prefix):]
+    return path(filename)
 
 args = sys.argv[1:] or ['.']
 for filename in args:
-    fullpath = path(filename).abspath()
+    fullpath = drop_prefixes(path(filename).abspath())
     print fullpath
     if not fullpath.exists():
         print '\twarning: above path does not exist'
