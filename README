@@ -4,7 +4,7 @@ Dependencies
 ------------
 - Python: http://python.org (these generally only require less-up-to-date versions since some of these needed to run on machines with older installations)
 
-- Most need my waterworks library: https://bitbucket.org/dmcc/waterworks or https://github.com/dmcc/waterworks
+- Most need my waterworks library: https://github.com/dmcc/waterworks or https://bitbucket.org/dmcc/waterworks
 
 - Some need mx.DateTime: http://pypi.python.org/pypi/egenix-mx-base/
 

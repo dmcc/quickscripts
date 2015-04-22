@@ -6,9 +6,11 @@
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
-# Code: http://code.zorglish.org
+# Code: http://github.com/dmcc
 
-import os, sys, time
+import os
+import sys
+import time
 from waterworks.Strings import pretty_time_range
 from waterworks.Processes import bettersystem
 from path import path
@@ -36,7 +38,8 @@ if not args:
     sys.exit(1)
 
 command = args[0]
-if '|' in command or '>' in command or '<' in command: # shell commands are handled differently
+# shell commands are handled differently
+if '|' in command or '>' in command or '<' in command:
     normalized_command = path(command.split()[0]).basename()
 else:
     normalized_command = path(command).basename()

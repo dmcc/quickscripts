@@ -8,7 +8,7 @@
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
-# Code: http://code.zorglish.org
+# Code: http://github.com/dmcc
 
 import ansi, sys, os
 
@@ -59,8 +59,8 @@ if remaining % 2 == 1:
     right += symbol
 
 print pound_colors + symbol * termwidth
-print ''.join((left, ansi.RESET, 
-               command_colors, command, ansi.RESET, 
+print ''.join((left, ansi.RESET,
+               command_colors, command, ansi.RESET,
                pound_colors, right))
 print symbol * termwidth + ansi.RESET
 if command:

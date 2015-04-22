@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
-# put "thrash" before your command and the command will be monitored for thrashing
+# put "thrash" before your command and the command will be monitored
+# for thrashing
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
-# Code: http://code.zorglish.org
+# Code: http://github.com/dmcc
 
-import os, sys, time, ansi
+import os
+import sys
+import time
+import ansi
 
 period = int(os.getenv('THRASH_PERIOD', '15'))
 
@@ -35,7 +39,7 @@ else: # parent
             print "Cur", ", ".join(stats)
         else:
             raise SystemExit # XXX bad hack
-        print "Max", ', '.join(["%s: %s" % pair 
-            for pair in maxes.items()]) + "]"
+        print "Max", ', '.join(["%s: %s" % pair
+                                for pair in maxes.items()]) + "]"
         print ansi.RESET
         time.sleep(period)

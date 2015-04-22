@@ -22,7 +22,7 @@
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
-# Code: http://code.zorglish.org
+# Code: http://github.com/dmcc
 
 import sys, re, pylab
 regex = re.compile(sys.argv[1])

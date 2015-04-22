@@ -12,7 +12,7 @@
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
-# Code: http://code.zorglish.org
+# Code: http://github.com/dmcc
 
 import sys
 from vimdiff import vimdiff
@@ -20,11 +20,12 @@ import optparse
 
 parser = optparse.OptionParser()
 parser.add_option('-w', '--split-by-whitespace', action='store_true',
-    help='Convert all whitespace to newlines')
+                  help='Convert all whitespace to newlines')
 parser.add_option('-s', '--split-by-sentences', action='store_true',
-    help='Convert sentence breaks (not very general: ". ") to newlines')
+                  help='Convert sentence breaks (not very general: ". ") to '
+                       'newlines')
 parser.add_option('-d', '--split-by-delimiter',
-    help='Split into lines by a delimter.', metavar='DELIMITER')
+                  help='Split into lines by a delimter.', metavar='DELIMITER')
 opts, args = parser.parse_args()
 
 # TODO could be generalized to K bits of text

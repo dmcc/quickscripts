@@ -11,10 +11,9 @@
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
-# Code: http://code.zorglish.org
+# Code: http://github.com/dmcc
 
 import sys
-import fileinput
 import itertools
 
 num_shards = int(sys.argv[1])
@@ -34,7 +33,7 @@ template = '%%s.%%0%dd' % num_digits
 # where shardnumber is 0-filled
 
 shard_files = [file(template % (filename, shard), 'w')
-    for shard in range(num_shards)]
+               for shard in range(num_shards)]
 shard_file_cycler = itertools.cycle(shard_files)
 
 for filename in filenames:

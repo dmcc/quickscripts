@@ -9,7 +9,7 @@
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
-# Code: http://code.zorglish.org
+# Code: http://github.com/dmcc
 
 from __future__ import division
 import fileinput
