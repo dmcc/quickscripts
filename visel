@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Helps you view/edit the current selection in vi/vim/gvim/vimx/...
+# I bind this to key combos like Meta+v and Meta+c.
 # Creates a temporary file, pastes the selection/clipboard in that file
 # and fires up vi. Note that the temporary file is deleted after vi is
 # closed and that the modified selection/clipboard is not (currently)
