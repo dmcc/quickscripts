@@ -2,11 +2,18 @@
 
 # Print out the full path to a filename and copy it to the X clipboard.
 # If multiple filenames are given, only the last one will be copied to
-# the clipboard. Requires 'xclip' for clipboard copying.
+# the clipboard. Requires 'xclip' for clipboard copying but will still
+# work without it.
 
-# If your filesystem is filled with ugly symlinks, you can set
-# $FULLPATHTO_PREFIXES to a colon (:) separated list of path prefixes
-# which will be stripped from paths before they're printed.
+# If your filesystem is filled with ugly symlinks, you can write
+# a function called cleanup_path in the localsite.paths module.
+# The function should take one string parameter with an absolute path
+# and return a string. If this function can't be found, no cleanups will
+# be performed. Example function:
+#   def cleanup_path(filename):
+#       if filename.startswith('/old/'):
+#           filename = filename[4:]
+#       return filename
 
 # Usage: fullpathto [filenames]
 
@@ -18,21 +25,14 @@ import sys
 import os
 from path import path
 
-prefixes_to_drop = os.getenv('FULLPATHTO_PREFIXES', '').split(':')
-
-def drop_prefixes(filename):
-    for prefix in prefixes_to_drop:
-        # strip extra slashes which will screw up our replacements
-        while prefix.endswith('/'):
-            prefix = prefix[:-1]
-
-        if filename.startswith(prefix):
-            filename = filename[len(prefix):]
-    return path(filename)
+try:
+    from localsite.paths import cleanup_path
+except ImportError:
+    cleanup_path = lambda filename: filename
 
 args = sys.argv[1:] or ['.']
 for filename in args:
-    fullpath = drop_prefixes(path(filename).abspath())
+    fullpath = path(cleanup_path(path(filename).abspath()))
     print fullpath
     if not fullpath.exists():
         print '\twarning: above path does not exist'
