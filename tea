@@ -65,6 +65,7 @@ else:
     for i, arg in enumerate(args):
         print 'Argument %d:\t       %s' % (i, arg)
 print 'Working directory:', os.getcwd()
+print 'Host:             ', os.uname()[1]
 print 'Start time:       ', start_time_desc
 print '-' * 18
 
