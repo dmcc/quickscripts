@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
-# Edit a Python module using its module name rather than filesystem path
+# Edit a Python module using its module name rather than filesystem path.
+# Designed to work from an import line as well ("import X" or
+# "from X import Y") for easier copy and paste.
 # e.g. 'edpy tempfile'
 #      'edpy calendar.Calendar' -- takes you directly to the class
 #      'edpy calendar.Calendar.monthdayscalendar' -- takes you directly to the method
+#      'edpy from calendar.Calendar import monthdayscalendar' -- same as above
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
