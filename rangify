@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+
+"""
+Summarize a series of numbers into a list of human-readable ranges:
+
+    shell> echo "1 3 5 10-20 4 101-105 102-106 -77" | rangify
+    -77, 1, 3-5, 10-20, 101-106
+"""
+
+# Dependencies:
+# needs my waterworks library:
+#   https://github.com/dmcc/waterworks
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://github.com/dmcc
+
+import fileinput
+import IntRange
+
+nums = set()
+for line in fileinput.input():
+    if line.strip():
+        nums.update(IntRange.parse(line))
+
+print IntRange.Rangifier(nums)
