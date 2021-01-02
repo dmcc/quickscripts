@@ -13,7 +13,7 @@ import os
 import sys
 import subprocess
 
-editor = os.getenv('VISUAL', 'gvim')
+editor = os.getenv('VISUAL', 'gvim').split()
 
 def split(arg):
     if ':' in arg:
@@ -24,5 +24,5 @@ def split(arg):
 
 args = map(split, sys.argv[1:])
 command = list(*args)
-command.insert(0, editor)
+command = editor + command
 subprocess.call(command)

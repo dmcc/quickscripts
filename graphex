@@ -50,15 +50,15 @@ for line in sys.stdin:
 colors = iter('rgb')
 
 if not points:
-    print "Error: didn't match any lines"
+    print("Error: didn't match any lines")
     raise SystemExit
 
-transformed = zip(*points)
+transformed = list(zip(*points))
 x = transformed[0]
 for y in transformed[1:]:
-    pylab.scatter(x, y, c=colors.next())
+    pylab.scatter(x, y, c=next(colors))
     for item in sorted(zip(x, y)):
-        print item
+        print(item)
 
 if names:
     pylab.legend(tuple(names[1:]))

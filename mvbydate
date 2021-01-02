@@ -8,9 +8,10 @@
 
 # vi: syntax=python
 
+import os
 import time
 from optparse import OptionParser
-from path import path
+from pathlib import Path
 from waterworks.Files import mkdirparents
 
 parser = OptionParser()
@@ -27,22 +28,22 @@ parser.add_option("-t", "--timestamp", default='mtime',
 (options, args) = parser.parse_args()
 
 for filename in args:
-    filename = path(filename)
-    if filename.isdir():
-        print "Skipping directory:", filename
+    filename = Path(filename)
+    if filename.is_dir():
+        print("Skipping directory:", filename)
         continue
-    timestamp = getattr(filename, 'get' + options.timestamp)()
+    timestamp = getattr(os.path, 'get' + options.timestamp)(filename)
     new_dirname = time.strftime(options.format, time.localtime(timestamp))
-    full_new_dirname = filename.dirname()/new_dirname
+    full_new_path = filename.parent/new_dirname/filename.name
     if not options.dry_run:
-        mkdirparents(full_new_dirname)
+        mkdirparents(full_new_path.parent)
 
     # in case full_new_dirname already existed and had a file with the
     # same name in it
-    if (full_new_dirname/filename).exists():
-        raise ValueError("%s already has a %s in it" % (full_new_dirname,
+    if full_new_path.exists():
+        raise ValueError("{} already has a {} in it".format(full_new_path.parent,
                          filename))
 
-    print 'mv', filename, full_new_dirname/(filename.basename())
+    print('mv', filename, full_new_path)
     if not options.dry_run:
-        filename.move(full_new_dirname)
+        filename.rename(full_new_path)

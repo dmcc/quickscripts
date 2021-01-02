@@ -11,4 +11,4 @@ import sys
 from waterworks.Strings import sumstring
 
 text = sys.stdin.read()
-print 'Sum:', sumstring(text)
+print('Sum:', sumstring(text))

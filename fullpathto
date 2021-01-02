@@ -23,7 +23,7 @@
 
 import sys
 import os
-from path import path
+from pathlib import Path
 
 try:
     from localsite.paths import cleanup_path
@@ -32,9 +32,9 @@ except ImportError:
 
 args = sys.argv[1:] or ['.']
 for filename in args:
-    fullpath = path(cleanup_path(path(filename).abspath()))
-    print fullpath
+    fullpath = Path(cleanup_path(Path(filename).absolute()))
+    print(fullpath)
     if not fullpath.exists():
-        print '\twarning: above path does not exist'
+        print('\twarning: above path does not exist')
     command = "echo '%s' | xclip -in" % fullpath
     os.system(command)

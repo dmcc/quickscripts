@@ -3,19 +3,19 @@
 # essentially my alarm clock logic -- handles any date/time format that mx.DateTime can handle
 
 # Dependencies:
-#   mx.DateTime: http://pypi.python.org/pypi/egenix-mx-base/
+#   dateparser
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
 # Code: http://github.com/dmcc
 
-import mx.DateTime, sys, time
+import dateparser, datetime, sys, time
 
-wakeuptime = mx.DateTime.Parser.DateTimeFromString("".join(sys.argv[1:]))
-diff = wakeuptime - mx.DateTime.now()
+wakeuptime = dateparser.parse("".join(sys.argv[1:]))
+diff = wakeuptime - datetime.datetime.now()
 
-if diff.seconds > 0:
-    print "Sleeping until:", wakeuptime, "(%s)" % diff
-    time.sleep(diff.seconds)
+if diff.total_seconds() > 0:
+    print("Sleeping until:", wakeuptime, "(%s)" % diff)
+    time.sleep(diff.total_seconds())
 else:
     sys.exit(1)

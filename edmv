@@ -51,41 +51,42 @@ def error(message):
     """Print a message and exit, printing a log of what we did and how to
     undo it."""
     # TODO: actually do the graceful exit and such
-    print "Error:", message
+    print("Error:", message)
     if file_mapping:
-        print "Mapping table:"
+        print("Mapping table:")
         for old, inter, new in file_mapping:
-            print repr(old), repr(inter), repr(new)
+            print(repr(old), repr(inter), repr(new))
     else:
-        print "No mapping table yet -- no changes were made."
+        print("No mapping table yet -- no changes were made.")
     sys.exit(1)
 
 def editron_move(editron=DEFAULT_EDITOR, files_to_rename=None):
     old_list = files_to_rename or []  # TODO: warn when old_list is empty
 
-    filename_list = tempfile.NamedTemporaryFile('r+w', dir="/tmp",
-                                                prefix="edmv")
-    filename_list.write('\n'.join(old_list) + '\n')
-    filename_list.flush()
-    filename_list_file = filename_list.name
+    with tempfile.NamedTemporaryFile(mode="w",
+                                     dir="/tmp",
+                                     prefix="edmv") as filename_list:
+        filename_list.write('\n'.join(old_list) + '\n')
+        filename_list.flush()
+        filename_list_file = filename_list.name
 
-    # editron must have exactly one %s
-    assert(editron.count('%s') == 1)
-    try:
-        command = editron % filename_list_file
-    except TypeError:
-        # we will get this if there are too many things to interpolate
-        error("editor ('%s') should have exactly one thing to interpolate." %
-              command)
+        # editron must have exactly one %s
+        assert(editron.count('%s') == 1)
+        try:
+            command = editron % filename_list_file
+        except TypeError:
+            # we will get this if there are too many things to interpolate
+            error("editor ('%s') should have exactly one thing to interpolate." %
+                  command)
 
-    print 'run', command
-    os.system(command)
+        print('run', command)
+        os.system(command)
 
-    filename_list.seek(0)
-    new_list = filename_list.read().splitlines()
+        with open(filename_list.name) as readable_filename_list:
+            new_list = readable_filename_list.read().splitlines()
 
     for old, new in zip(old_list, new_list):
-        print "%s -> %s" % (old, new)
+        print(f"{old} -> {new}")
 
     try:
         perform_rename(old_list, new_list)
@@ -102,7 +103,7 @@ def perform_rename(old_list, new_list):
     temp_directory = tempfile.mkdtemp(prefix='edmv')
 
     def intermediate_name(old_name):
-        return "%s/%d-%s" % (temp_directory, old_list.index(old), old)
+        return "%s/%d-%s" % (temp_directory, old_list.index(old_name), old_name)
 
     file_mapping = [(old, intermediate_name(old), new)
                     for old, new in zip(old_list, new_list)]
@@ -110,10 +111,10 @@ def perform_rename(old_list, new_list):
     # next, move every file to the temporary directory, giving it a unique
     # name -- list index is sufficient in this case
     for old, inter, new in file_mapping:
-        print "rename %r -> %r" % (old, inter)
+        print(f"rename {old!r} -> {inter!r}")
         shutil.move(old, inter)
     for old, inter, new in file_mapping:
-        print "rename %r -> %r" % (inter, new)
+        print(f"rename {inter!r} -> {new!r}")
         shutil.move(inter, new)
 
     # erase temporary directory -- everything should have been moved out of it

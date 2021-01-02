@@ -40,8 +40,8 @@ def split(text):
     return text
 
 text1 = split(sys.stdin.read().strip())
-print "Read text 1 (%s chars)" % len(text1)
+print("Read text 1 (%s chars)" % len(text1))
 text2 = split(sys.stdin.read().strip())
-print "Read text 2 (%s chars)" % len(text2)
+print("Read text 2 (%s chars)" % len(text2))
 
 vimdiff(text1, text2)

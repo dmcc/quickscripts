@@ -11,7 +11,6 @@
 # Homepage: http://zorglish.org
 # Code: http://github.com/dmcc
 
-from __future__ import division
 import fileinput
 import AIMA
 from waterworks.Strings import try_parse_float
@@ -34,11 +33,11 @@ def summary_func_describer(func):
 
 def uniq(nums):
     num_uniq = len(set(nums))
-    return '%s [%s]' % (num_uniq, pretty_percent(num_uniq))
+    return '{} [{}]'.format(num_uniq, pretty_percent(num_uniq))
 
 def count_zeros(nums):
     num_zeros = nums.count(0)
-    return '%s [%s]' % (num_zeros, pretty_percent(num_zeros))
+    return '{} [{}]'.format(num_zeros, pretty_percent(num_zeros))
 
 funcs = (
     ('min', summary_func_describer(min)),
@@ -56,12 +55,13 @@ funcs = (
 for name, func in funcs:
     try:
         result = func(nums)
-    except Exception, e:
+    except Exception as e:
         result = e
-    print "%10s: %s" % (name, result)
+    print(f"{name:>10}: {result}")
 
-print ' histogram:'
+print(' histogram:')
 try:
-    print Histogram.histogramify(nums)
-except Exception, e:
-    print e
+    print(Histogram.histogramify(nums))
+except Exception as e:
+    print(e)
+    raise

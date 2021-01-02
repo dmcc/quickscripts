@@ -32,7 +32,7 @@ def file_iter():
         yield sys.stdin
     else:
         for filename in filenames:
-            f = file(filename)
+            f = open(filename)
             yield f
             del f
 
@@ -42,5 +42,5 @@ for input_file in file_iter():
             line = line.replace(old, new)
         try:
             sys.stdout.write(line)
-        except IOError:
+        except OSError:
             raise SystemExit

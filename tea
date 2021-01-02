@@ -13,7 +13,7 @@ import sys
 import time
 from waterworks.Strings import pretty_time_range
 from waterworks.Processes import bettersystem
-from path import path
+from pathlib import Path
 
 # TODO make sure output file doesn't exist yet
 
@@ -34,48 +34,48 @@ start = time.time()
 
 args = sys.argv[1:]
 if not args:
-    print "Usage: tea command [args]"
+    print("Usage: tea command [args]")
     sys.exit(1)
 
 command = args[0]
 # shell commands are handled differently
 if '|' in command or '>' in command or '<' in command:
-    normalized_command = path(command.split()[0]).basename()
+    normalized_command = Path(command.split()[0]).name
 else:
-    normalized_command = path(command).basename()
+    normalized_command = Path(command).name
 start_time_desc = format_time(start)
-output_filename = path('tea-%s-%s.log' % (normalized_command, start_time_desc))
-if not path('.').access(os.W_OK):
-    output_filename = path('/tmp')/output_filename
-print "(redirecting to %s)" % output_filename
-print
+output_filename = Path(f'tea-{normalized_command}-{start_time_desc}.log')
+if not os.access('.', os.W_OK):
+    output_filename = Path('/tmp')/output_filename
+print("(redirecting to %s)" % output_filename)
+print()
 
 # redirect stdout/stderr
-output_file = file(output_filename, 'w')
+output_file = open(output_filename, 'w')
 tee = Tee(output_file)
 sys.stdout = tee
 sys.stderr = tee
 
 output_file.write(' '.join(args) + '\n\n')
-print 'Command:          ', command
+print('Command:          ', command)
 args.pop(0)
 if not args:
-    print 'Args:              (none)'
+    print('Args:              (none)')
 else:
     for i, arg in enumerate(args):
-        print 'Argument %d:\t       %s' % (i, arg)
-print 'Working directory:', os.getcwd()
-print 'Host:             ', os.uname()[1]
-print 'Start time:       ', start_time_desc
-print '-' * 18
+        print('Argument %d:\t       %s' % (i, arg))
+print('Working directory:', os.getcwd())
+print('Host:             ', os.uname()[1])
+print('Start time:       ', start_time_desc)
+print('-' * 18)
 
 return_code = bettersystem(' '.join([command] + args))
 end = time.time()
 
-print '-' * 18
+print('-' * 18)
 if return_code != 0:
-    print 'Return code:      ', return_code
-print 'End time:         ', format_time(end)
+    print('Return code:      ', return_code)
+print('End time:         ', format_time(end))
 diff = end - start
 if diff > 0.1:
-    print 'Duration:         ', pretty_time_range(diff)
+    print('Duration:         ', pretty_time_range(diff))

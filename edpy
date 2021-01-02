@@ -45,8 +45,8 @@ lines, lineno = inspect.findsource(obj)
 editor = os.getenv('EDITOR', 'vi')
 # seems vi and emacs support this
 if ('vi' in editor or 'emacs' in editor) and lineno is not None:
-    editor_args.append(' +%d' % (lineno + 1))
+    editor_args.append('+%d' % (lineno + 1))
 
-command = "%s %s %s" % (editor, ' '.join(editor_args), filename)
-print "Running", repr(command)
+command = "{} {} {}".format(editor, ' '.join(editor_args), filename)
+print("Running", repr(command))
 os.system(command)

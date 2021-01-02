@@ -32,11 +32,11 @@ template = '%%s.%%0%dd' % num_digits
 # template resolves to filename.shardnumber
 # where shardnumber is 0-filled
 
-shard_files = [file(template % (filename, shard), 'w')
+shard_files = [open(template % (filename, shard), 'w')
                for shard in range(num_shards)]
 shard_file_cycler = itertools.cycle(shard_files)
 
 for filename in filenames:
-    for line in file(filename):
-        shard_file = shard_file_cycler.next()
+    for line in open(filename):
+        shard_file = next(shard_file_cycler)
         shard_file.write(line)

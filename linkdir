@@ -24,12 +24,12 @@ for dirname in sys.argv[1:]:
 
         if suffix:
             root, ext = os.path.splitext(filename)
-            newname = os.path.join(curdir, "%s-%s%s" % (root, suffix, ext))
+            newname = os.path.join(curdir, f"{root}-{suffix}{ext}")
         else:
             newname = os.path.join(curdir, filename)
 
         try:
             os.symlink(oldname, newname)
-            print "Linked", oldname, "to", newname
+            print("Linked", oldname, "to", newname)
         except OSError:
-            print "Couldn't make link from", oldname, "to", newname
+            print("Couldn't make link from", oldname, "to", newname)

@@ -23,4 +23,4 @@ for line in fileinput.input():
     if line.strip():
         nums.update(IntRange.parse(line))
 
-print IntRange.Rangifier(nums)
+print(IntRange.Rangifier(nums))

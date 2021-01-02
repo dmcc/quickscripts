@@ -52,16 +52,16 @@ if not command.strip():
 command_len = len(command)
 remaining = termwidth - command_len
 
-left = symbol * (remaining / 2)
+left = symbol * (remaining // 2)
 right = left
 # if odd number of characters, put the extra # on the right
 if remaining % 2 == 1:
     right += symbol
 
-print pound_colors + symbol * termwidth
-print ''.join((left, ansi.RESET,
+print(pound_colors + symbol * termwidth)
+print(''.join((left, ansi.RESET,
                command_colors, command, ansi.RESET,
-               pound_colors, right))
-print symbol * termwidth + ansi.RESET
+               pound_colors, right)))
+print(symbol * termwidth + ansi.RESET)
 if command:
     sys.exit(os.system(command))

@@ -13,4 +13,4 @@ Pipe command that sorts the characters in each line:
 import fileinput
 for line in fileinput.input():
     line = line.rstrip()
-    print ''.join(sorted(line))
+    print(''.join(sorted(line)))

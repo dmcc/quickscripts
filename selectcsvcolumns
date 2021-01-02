@@ -22,7 +22,7 @@ Usage: selectcsvcolumns list-of-columns csv-filenames
 import sys, csv
 
 if len(sys.argv) < 3:
-    print __doc__.strip()
+    print(__doc__.strip())
     sys.exit(1)
 
 columns = sys.argv[1].split(',')
@@ -30,10 +30,10 @@ output_csv_writer = csv.writer(sys.stdout)
 output_csv_writer.writerow(columns)
 
 for filename in sys.argv[2:]:
-    reader = csv.reader(file(filename))
+    reader = csv.reader(open(filename))
     # assume first line is a header and learn the names of columns from it
-    header = reader.next()
-    header_mapping = dict((v, k) for (k, v) in enumerate(header))
+    header = next(reader)
+    header_mapping = {v: k for (k, v) in enumerate(header)}
     for row in reader:
         # pick out only the columns that people asked for
         selected_row = [row[header_mapping[column]] for column in columns]

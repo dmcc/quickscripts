@@ -35,25 +35,25 @@ def check_or_repair(filename):
     parser.setContentHandler(tag_stack)
 
     try:
-        parser.parse(open(filename, "r"))
-    except xml.sax._exceptions.SAXParseException, e:
+        parser.parse(open(filename))
+    except xml.sax._exceptions.SAXParseException as e:
         if e.getMessage() != 'no element found':
-            print "Error:", e
-            print 'There is probably junk at', e.getLineNumber(), e.getColumnNumber(),
-            print "Remove it manually and run this again to complete the file."
-            print "vi %s +%s" % (filename, e.getLineNumber())
+            print("Error:", e)
+            print('There is probably junk at', e.getLineNumber(), e.getColumnNumber(), end=' ')
+            print("Remove it manually and run this again to complete the file.")
+            print(f"vi {filename} +{e.getLineNumber()}")
             return
 
     if tag_stack.stack:
-        print 'stack:', tag_stack.stack
-        f = file(filename, 'a')
+        print('stack:', tag_stack.stack)
+        f = open(filename, 'a')
         f.write(tag_stack.closing_tags())
         f.close()
     else:
-        print "already complete"
+        print("already complete")
 
 if __name__ == "__main__":
     for filename in sys.argv[1:]:
-        print "Filename:", filename
+        print("Filename:", filename)
         check_or_repair(filename)
-        print
+        print()

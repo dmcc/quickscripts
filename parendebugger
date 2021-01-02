@@ -14,18 +14,18 @@ for line in fileinput.input():
         if not token:
             continue
         if depth == 0:
-            print "--- Sentence %d --- " % sentence_count
+            print("--- Sentence %d --- " % sentence_count)
             sentence_count += 1
         if token == '(':
-            print "%s%s" % ('. ' * depth, token)
+            print("{}{}".format('. ' * depth, token))
             depth += 1
         elif token == ')':
             depth -= 1
-            print "%s%s" % ('. ' * depth, token)
+            print("{}{}".format('. ' * depth, token))
             if depth < 0:
                 raise ValueError("Too many )s")
         else:
-            print "%s%s" % ('. ' * depth, token)
+            print("{}{}".format('. ' * depth, token))
 
 if depth != 0:
     raise ValueError("Not enough )s -- depth wasn't 0 at end.")

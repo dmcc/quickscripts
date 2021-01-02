@@ -17,10 +17,10 @@ import time
 
 def edit_selection(mode, registers, vi_command, verbose=False):
     time_desc = time.strftime('%H.%M')
-    prefix = '%s-%s-' % (mode, time_desc)
+    prefix = f'{mode}-{time_desc}-'
     with tempfile.NamedTemporaryFile(prefix=prefix) as f:
         if verbose:
-            print 'tempfile:', f.name
+            print('tempfile:', f.name)
         # start vim, ask it paste text from the appropriate register(s), and
         # save it to the temporary file. since it's a NamedTemporaryFile,
         # it will be erased afterwards.

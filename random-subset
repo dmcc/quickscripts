@@ -53,20 +53,20 @@ def main():
         lines = []
         for fn in args:
             try:
-                lines += open(fn, 'r').readlines()
-            except IOError, e:
+                lines += open(fn).readlines()
+            except OSError as e:
                 raise SystemExit("Error: reading file %s" % fn)
     else:
-        lines = map(lambda x: x[:-1], sys.stdin.readlines())
+        lines = list(map(lambda x: x[:-1], sys.stdin.readlines()))
 
-    for i in xrange(0, opts.count):
+    for i in range(0, opts.count):
         if len( lines ) == 0:
             break
         r = int(random.random() * len(lines))
         s = lines[r]
         if opts.prepend:
             s = opts.prepend + s
-        print s
+        print(s)
         del lines[r]
 
 if __name__ == '__main__':

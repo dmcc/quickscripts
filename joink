@@ -31,4 +31,4 @@ k = int(sys.argv[-1])
 separator = ' '
 for lines in batch(sys.stdin, batchsize=k):
     lines = [line.rstrip() for line in lines]
-    print separator.join(lines)
+    print(separator.join(lines))
