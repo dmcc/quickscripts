@@ -1,16 +1,21 @@
 #!/usr/bin/env python
 
 # Program to draw separators between commands
-# I made this because I often type commands which have many pages of output
-# (e.g. 'cvs diff -u' and 'darcs whatsnew').  If these commands use colors,
-# they can't be shown easily in less(1).  The separators make it easy to
-# see where the command started.
+# I made this because I often type commands which have many pages of
+# output. The separators make it easy to see where the command started.
+
+# Pass -n as the first argument to print a banner and not actually
+# execute the command.
+
+# Dependencies:
+#   ansicolors (https://pypi.org/project/ansicolors)
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
 # Code: http://github.com/dmcc
 
-import ansi, sys, os
+import sys, os
+import colors
 
 # lifted from http://pdos.csail.mit.edu/~cblake/cls/cls.py
 # --------------------------------------------------------
@@ -43,25 +48,33 @@ def terminal_size():                    ### decide on *some* terminal size
 
 termwidth, termheight = terminal_size()
 symbol = '#'
-pound_colors = ansi.RED
-command_colors = ansi.BOLD
 
-command = ' ' + ' '.join(sys.argv[1:]) + ' '
+# Very basic option parsing.
+args = sys.argv[1:]
+if args and args[0] == '-n':
+    run_command = False
+    args.pop(0)
+else:
+    run_command = True
+
+command = ' ' + ' '.join(args) + ' '
 if not command.strip():
     command = ''
 command_len = len(command)
 remaining = termwidth - command_len
 
+bar = colors.color(symbol * termwidth, fg='red')
 left = symbol * (remaining // 2)
 right = left
 # if odd number of characters, put the extra # on the right
 if remaining % 2 == 1:
     right += symbol
 
-print(pound_colors + symbol * termwidth)
-print(''.join((left, ansi.RESET,
-               command_colors, command, ansi.RESET,
-               pound_colors, right)))
-print(symbol * termwidth + ansi.RESET)
-if command:
+print(bar)
+print(''.join((colors.color(left, fg='red'),
+               colors.color(command, style='bold'),
+               colors.color(right, fg='red'))))
+print(bar)
+
+if command and run_command:
     sys.exit(os.system(command))

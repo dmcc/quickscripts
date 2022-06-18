@@ -6,13 +6,16 @@ See also quickcolorize which is similar but doesn't do filtering."""
 # Dependencies:
 # needs my waterworks library:
 #   https://github.com/dmcc/waterworks
+# and
+#   ansicolors (https://pypi.org/project/ansicolors)
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
 # Code: http://github.com/dmcc
 
 import sys
-import ansi
+import colors
+
 from QuickColorize import colorize
 
 words = sys.argv[1:]
@@ -25,6 +28,5 @@ for line in sys.stdin:
     if not skip:
         for word in words:
             color_word = colorize(word)
-            # no ansi.RESET needed since colorize() does that for us
-            line = line.replace(word, ansi.BOLD + color_word)
+            line = line.replace(word, colors.color(color_word, style='bold'))
         sys.stdout.write(line)

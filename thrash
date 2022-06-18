@@ -3,6 +3,9 @@
 # put "thrash" before your command and the command will be monitored
 # for thrashing
 
+# Dependencies:
+#   ansicolors (https://pypi.org/project/ansicolors)
+
 # Author: David McClosky
 # Homepage: http://zorglish.org
 # Code: http://github.com/dmcc
@@ -10,7 +13,8 @@
 import os
 import sys
 import time
-import ansi
+
+import colors
 
 period = int(os.getenv('THRASH_PERIOD', '15'))
 
@@ -24,7 +28,7 @@ else: # parent
     maxes = {}
     while 1:
         print()
-        print(ansi.RED + "[Time:", time.asctime(), end=' ')
+        print(colors.color(f"[Time: {time.asctime()}", fg='red'), end=' ')
         stats = []
         for line in open('/proc/%s/status' % pid):
             if line.startswith('Vm'):
@@ -36,10 +40,9 @@ else: # parent
                 maxes.setdefault(attr, 0)
                 maxes[attr] = max(maxes[attr], val)
         if stats:
-            print("Cur", ", ".join(stats))
+            print(colors.color("Cur: " + ", ".join(stats), fg='red'))
         else:
             raise SystemExit # XXX bad hack
-        print("Max", ', '.join(["%s: %s" % pair
-                                for pair in maxes.items()]) + "]")
-        print(ansi.RESET)
+        print(colors.color("Max " + ', '.join(["%s: %s" % pair
+                        for pair in maxes.items()]) + "]", fg='red'))
         time.sleep(period)
