@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+
+# Given two filenames, reads each as a set of strings, then provides
+# simple statistics about the two sets.
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://github.com/dmcc
+
+import sys
+
+def unique_items_and_duplicate_count(iterable):
+  items = set()
+  dupes = 0
+  for item in iterable:
+    if item in items:
+      dupes += 1
+      continue
+    else:
+      items.add(item)
+  return items, dupes
+
+filename1, filename2 = sys.argv[-2:]
+
+lines1, dupes1 = unique_items_and_duplicate_count(open(filename1))
+
+print("%s: %d unique lines [%d duplicates]" % (filename1, len(lines1), dupes1))
+
+lines2, dupes2 = unique_items_and_duplicate_count(open(filename2))
+
+print("%s: %d unique lines [%d duplicates]" % (filename2, len(lines2), dupes2))
+
+print("Intersection: %d lines" % len(lines1 & lines2))
+print("Union: %d lines" % len(lines1 | lines2))
+print("Only in %s: %d lines" % (filename1, len(lines1 - lines2)))
+print("Only in %s: %d lines" % (filename2, len(lines2 - lines1)))
+print("Only in one file: %d lines" % len(lines1 ^ lines2))
