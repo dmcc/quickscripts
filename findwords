@@ -5,7 +5,7 @@ See also quickcolorize which is similar but doesn't do filtering."""
 
 # Dependencies:
 # needs my waterworks library:
-#   https://bitbucket.org/dmcc/waterworks
+#   https://github.com/dmcc/waterworks
 
 # Author: David McClosky
 # Homepage: http://zorglish.org

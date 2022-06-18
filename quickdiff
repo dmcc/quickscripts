@@ -8,13 +8,12 @@
 
 # Dependencies:
 # needs my waterworks library:
-#   https://bitbucket.org/dmcc/waterworks
+#   https://github.com/dmcc/waterworks
 
 # Author: David McClosky
 # Homepage: http://zorglish.org
 # Code: http://github.com/dmcc
 
-import sys
 from vimdiff import vimdiff
 import optparse
 

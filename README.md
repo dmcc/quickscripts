@@ -1,14 +1,15 @@
+Quickscripts
+============
+
 As the name implies, these are some quick command-line scripts that I've written.  Hopefully their uses are mostly self-explanatory.  By putting these into a repository, I hope to move some of these away from quick hacks and closer towards more user-friendly software.
 
 Dependencies
 ------------
-- Python: http://python.org (these generally only require less-up-to-date versions since some of these needed to run on machines with older installations)
+- [Python 3](http://python.org)
 
-- Most need my waterworks library: https://github.com/dmcc/waterworks or https://bitbucket.org/dmcc/waterworks
+- Most need my [waterworks](https://github.com/dmcc/waterworks) library
 
-- Some need mx.DateTime: http://pypi.python.org/pypi/egenix-mx-base/
-
-- Some need matplotlib: http://matplotlib.sourceforge.net/
+- Some need others -- each file should list any extra dependencies
 
 License
 -------

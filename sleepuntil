@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-# essentially my alarm clock logic -- handles any date/time format that mx.DateTime can handle
+# essentially my alarm clock logic -- handles any date/time format that
+# dateparser can handle
 
 # Dependencies:
 #   dateparser
