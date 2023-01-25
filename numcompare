@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+# Tries to parse each line as a number then presents the numbers aligned
+# in an ANSI table. Doesn't handle high precision numbers well.
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://github.com/dmcc
+
+import sys
+
+import texttable
+
+from waterworks.Strings import try_parse_float
+
+text = ' '.join(sys.argv[1:])
+if not text:
+    text = sys.stdin.read()
+
+numbers = [['Numbers!']]
+for token in text.split():
+    maybe_num = try_parse_float(token, None)
+    if maybe_num is None:
+        continue
+    numbers.append([maybe_num])
+
+table = texttable.Texttable()
+table.set_cols_align(['r'])
+table.set_cols_dtype(['f'])
+table.add_rows(numbers)
+
+print(table.draw())
