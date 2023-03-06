@@ -22,13 +22,21 @@ Usage:
 # Homepage: http://zorglish.org
 # Code: http://github.com/dmcc
 
-# TODO: configurable separator
-
-import sys
 from iterextras import batch
+import argparse
+import fileinput
+import sys
 
-k = int(sys.argv[-1])
-separator = ' '
-for lines in batch(sys.stdin, batchsize=k):
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "filenames", metavar="F", type=str, nargs="*", help="Filenames to read from"
+)
+parser.add_argument("-s", "--separator", help="", default=" ")
+parser.add_argument(
+    "-n", "--num-lines", help="How many lines to join", type=int, default=2
+)
+args = parser.parse_args()
+
+for lines in batch(fileinput.input(files=args.filenames), batchsize=args.num_lines):
     lines = [line.rstrip() for line in lines]
-    print(separator.join(lines))
+    print(args.separator.join(lines))
