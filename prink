@@ -1,0 +1,155 @@
+#!/usr/bin/env python
+"""Pretty print and highlighter for some standard formats.
+
+See also https://github.com/sharkdp/bat
+and https://github.com/eth-p/bat-extras/blob/master/doc/prettybat.md
+"""
+
+# Needs these package:
+#   sudo apt-get install highlight
+#   pip3 install --user markdown bs4 ruamel.yaml
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://github.com/dmcc
+
+import argparse
+import collections
+import csv
+import io
+import json
+import pprint
+import string
+import subprocess
+import sys
+import tempfile
+
+from bs4 import BeautifulSoup
+import markdown
+from ruamel.yaml import YAML
+
+
+def highlight(text, syntax):
+    """Run text through the 'highlight' command line program."""
+    # Somehow, this is totally fine even if you don't have 'highlight'
+    # installed (it's then just a passthrough).
+    highlighter = subprocess.Popen(
+        ["/usr/bin/highlight", "--syntax", syntax, "--out-format", "truecolor"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        text=True,
+    )
+    return highlighter.communicate(text)[0]
+
+
+# Priority: should be pretty far down since BeautifulSoup is permissive
+def try_detect_html(text):
+    """Format text if parsable as HTML, XML, SVG, GPX, etc."""
+    try:
+        soup = BeautifulSoup(text, "lxml")
+        pretty_printed = soup.prettify()
+        return highlight(pretty_printed, syntax="html")
+    except:
+        raise ValueError
+
+
+# Priority: needs to be ahead of CSV and YAML which can misdetect this
+def try_detect_json(text):
+    """Format text if parsable as JSON."""
+    try:
+        json_dict = json.loads(text)
+        pretty_printed = pprint.pformat(json_dict)
+        return highlight(pretty_printed, syntax="json")
+    except:
+        raise ValueError
+
+
+def try_detect_csv(text):
+    """Format text if parsable as CSV or TSV."""
+    try:
+        # TODO: if there are lots of cases where the StringIO is useful,
+        # we'll pull it out.
+        csv_io = io.StringIO(text)
+        csv_dicts = csv.DictReader(csv_io)
+        pretty_printed = "\n".join(pprint.pformat(csv_dict) for csv_dict in csv_dicts)
+        return highlight(pretty_printed, syntax="json")
+    except:
+        raise ValueError
+
+
+def try_detect_md(text):
+    """Format text if parsable as Markdown."""
+    try:
+        markdown.markdown(text)
+        # We don't actually need its parsed Markdown result (since we
+        # don't reformat), just that it was Markdown and can pass the
+        # original text to highlight.
+        return highlight(text, syntax="md")
+    except:
+        raise ValueError
+
+
+def try_detect_yaml(text):
+    """Format text if parsable as YAML."""
+    try:
+        yaml = YAML(typ="safe")
+        parsed = yaml.load(text)
+        pretty_printed = pprint.pformat(parsed)
+        return highlight(pretty_printed, syntax="json")
+    except:
+        raise ValueError
+
+
+all_detectors = [
+    ("json", try_detect_json),
+    ("yaml", try_detect_yaml),
+    ("md", try_detect_md),
+    ("csv", try_detect_csv),
+    ("html", try_detect_html),
+]
+
+
+def try_all_detectors(text, args):
+    for format, detector in all_detectors:
+        # Skip it if we're looking for a specific format
+        if args.format and args.format != format:
+            continue
+
+        try:
+            reformatted = detector(text)
+            if args.less:
+                with tempfile.NamedTemporaryFile(mode="w") as tmp:
+                    tmp.write(reformatted)
+                    tmp.flush()
+                    subprocess.call(["/usr/bin/less", "-SnR", tmp.name])
+            else:
+                print(reformatted)
+            break
+        except ValueError:
+            if args.format:
+                # If we get here, we were looking for a specific format but failed.
+                print(f"Couldn't parse as '{args.format}'")
+            pass
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "filenames", metavar="F", type=str, nargs="*", help="Filenames to read from"
+    )
+    parser.add_argument(
+        "-f", "--format", type=str, help="Force a specific parser/formatter"
+    )
+    parser.add_argument(
+        "-l", "--less", action="store_true", help="Open results in less"
+    )
+    args = parser.parse_args()
+
+    # We don't use fileinput since it won't let us minimize reads.
+    if args.filenames:
+        for filename in args.filenames:
+            with open(filename) as text:
+                try_all_detectors(text.read(), args)
+    else:
+        text = sys.stdin.read()
+        try_all_detectors(text, args)
