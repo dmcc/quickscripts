@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+
+# Allows you to bind tilt-wheel buttons to application-specific keystrokes.
+# There's currently no real configuration, so if you want to customize, you'll
+# need to edit the code.
+
+# Dependencies:
+# - Xlib
+# - icecream
+# - rich
+# - pynput
+
+# Author: David McClosky
+# Homepage: http://zorglish.org
+# Code: http://github.com/dmcc
+
+import sys
+import time
+
+from pynput.mouse import Listener
+from pynput.keyboard import Key, Controller
+import Xlib.display
+
+from icecream import ic
+from rich.console import Console
+
+console = Console()
+
+SCROLL_UP = 4
+SCROLL_DOWN = 5
+SCROLL_LEFT = 6
+SCROLL_RIGHT = 7
+THUMB_BACK = 8
+THUMB_FRONT = 9
+
+scroll_to_button = {
+    (0, 1): SCROLL_UP,
+    (0, -1): SCROLL_DOWN,
+    (-1, 0): SCROLL_LEFT,
+    (1, 0): SCROLL_RIGHT,
+}
+
+event_mapping = {
+    "Gnome-terminal": {
+        THUMB_BACK: (Key.shift, Key.page_down),
+        THUMB_FRONT: (Key.shift, Key.page_up),
+    },
+    "Google-chrome": {
+        # NOTE: We don't need to do anything for THUMB_* since Chrome does this for us
+        SCROLL_LEFT: (Key.ctrl, 'w'), # Close tab
+        SCROLL_RIGHT: (Key.ctrl, Key.shift, 't'), # Reopen tab
+    },
+    "firefox_firefox": {
+        # NOTE: We don't need to do anything for THUMB_* since Firefox does this for us
+        SCROLL_LEFT: (Key.ctrl, 'w'), # Close tab
+        SCROLL_RIGHT: (Key.ctrl, Key.shift, 't'), # Reopen tab
+    },
+    "Code": {
+        # NOTE: We don't need to do anything for THUMB_* since VS Code does this for us
+        SCROLL_LEFT: (Key.ctrl, Key.page_up),
+        SCROLL_RIGHT: (Key.ctrl, Key.page_down),
+    },
+    "Gvim": {
+        THUMB_BACK: (Key.page_down,),
+        THUMB_FRONT: (Key.page_up,),
+    },
+}
+# TODO: is this necessary?
+buttons_used = set(scroll_to_button.values())
+buttons_used.update((THUMB_BACK, THUMB_FRONT))
+
+display = Xlib.display.Display()
+
+# TODO: drop wmname stuff since we might not need it/not always populated
+def get_active_window_and_class():
+    window = display.get_input_focus().focus
+    wmname = window.get_wm_name()
+    wmclass = window.get_wm_class()
+    if wmclass is None:
+        window = window.query_tree().parent
+        wmclass = window.get_wm_class()
+        wmname = window.get_wm_name()
+    if wmclass is None:
+        window_class = None
+    else:
+        window_class = wmclass[1]
+    return (window_class, wmname)
+
+
+class ClickListener:
+    def __init__(self):
+        self.keyboard = Controller()
+        with Listener(on_click=self.on_click, on_scroll=self.on_scroll) as listener:
+            console.log('Listening...')
+            for window_class in sorted(event_mapping.keys()):
+                console.log(f'Loaded mapping for {window_class!r}')
+            listener.join()
+
+    def on_click(self, x, y, button, pressed):
+        if button.value not in buttons_used:
+            return
+
+        if not pressed: # = released
+            self.detect_window_and_simulate_events(button.value)
+
+    def on_scroll(self, x, y, dx, dy):
+        button = scroll_to_button[dx, dy]
+        if button not in buttons_used:
+            return
+
+        self.detect_window_and_simulate_events(button)
+
+    def detect_window_and_simulate_events(self, button_number):
+        window_class = None
+        # TODO: switch to retry library
+        for _ in range(20):
+            try:
+                window_class, _ = get_active_window_and_class()
+            except:
+                time.sleep(0.1)
+                continue
+        if window_class is None:
+            console.log('error: window_class is None')
+            return
+
+        window_buttons = event_mapping.get(window_class, {})
+        action = window_buttons.get(button_number)
+
+        if action is None:
+            return
+
+        if len(action) == 1:
+            self.keyboard.tap(action[0])
+        else:
+            for key in action:
+                self.keyboard.press(key)
+            for key in reversed(action):
+                self.keyboard.release(key)
+
+
+if __name__ == "__main__":
+    try:
+        listener = ClickListener()
+    except KeyboardInterrupt:
+        pass
